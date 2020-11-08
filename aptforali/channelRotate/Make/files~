@@ -1,0 +1,3 @@
+channelFoamv230.C
+
+EXE = $(FOAM_APPBIN)/channelFoam

@@ -1,0 +1,2 @@
+mappedRescaledVelocityFvPatchField.C
+LIB = $(FOAM_USER_LIBBIN)/libmyDDESInflowBC_komega

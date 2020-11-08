@@ -1,0 +1,6 @@
+dykOmegaBIF/dykOmegaBIF.C
+kOmegaDDES/kOmegaDDES.C
+dykOmegaBIFComplex/dykOmegaBIFComplex.C
+
+LIB = $(FOAM_USER_LIBBIN)/libkOmegaDES
+

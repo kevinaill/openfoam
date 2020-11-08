@@ -1,0 +1,6 @@
+profile1DfixedValueFvPatchFields.C
+profile1DRawData.C
+
+
+LIB = $(FOAM_USER_LIBBIN)/libprofile1DfixedValue
+

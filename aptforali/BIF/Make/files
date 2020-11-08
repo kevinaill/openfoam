@@ -1,0 +1,7 @@
+BifurcationComplex/BifurcationComplex.C
+kOmegaBIF/kOmegaBIF.C
+kOmegaSSTBifurcation/kOmegaSSTBifurcation.C
+
+
+LIB = $(FOAM_USER_LIBBIN)/libBifurcation
+

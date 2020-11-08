@@ -1,0 +1,1 @@
+I use the shielding function proposed by Shur 2006 in this turbulence model. But the definition of the delta is proposed by Reddy 2014, which is fd*V^(1/3)+(1-fd)*hmax.I use the DDES length scale lDDES to clip the dissipation term of the k-equation.
