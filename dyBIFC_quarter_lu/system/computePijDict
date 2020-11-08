@@ -1,0 +1,140 @@
+    computePij
+    {
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computePij;
+        //writeControl    writeTime;
+        //outputControl   timeStep;
+        //outputInterval  5;
+        outputControl   outputTime;
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volSymmTensorField& UPrime2Mean = mesh().lookupObject<volSymmTensorField>("UPrime2Mean");
+            const volTensorField& GradUMean = mesh().lookupObject<volTensorField>("GradUMean");
+            const volVectorField& UMean = mesh().lookupObject<volVectorField>("UMean");
+	    volScalarField R_uu("R_uu", UPrime2Mean.component(symmTensor::XX));
+	    volScalarField R_uv("R_uv", UPrime2Mean.component(symmTensor::XY));
+	    volScalarField R_vv("R_vv", UPrime2Mean.component(symmTensor::YY));
+	    volScalarField R_uw("R_uw", UPrime2Mean.component(symmTensor::XZ));
+	    volScalarField R_vw("R_vw", UPrime2Mean.component(symmTensor::YZ));
+	    volScalarField R_ww("R_ww", UPrime2Mean.component(symmTensor::ZZ));
+	    volScalarField G_uu("G_uu", GradUMean.component(tensor::XX));
+	    volScalarField G_uv("G_uv", GradUMean.component(tensor::XY));
+	    volScalarField G_uw("G_uw", GradUMean.component(tensor::XZ));
+	    volScalarField G_vu("G_vu", GradUMean.component(tensor::YX));
+	    volScalarField G_vv("G_vv", GradUMean.component(tensor::YY));
+	    volScalarField G_vw("G_vw", GradUMean.component(tensor::YZ));
+	    volScalarField G_wu("G_wu", GradUMean.component(tensor::ZX));
+	    volScalarField G_wv("G_wv", GradUMean.component(tensor::ZY));
+	    volScalarField G_ww("G_ww", GradUMean.component(tensor::ZZ));
+
+	    static autoPtr<volScalarField> sField;
+	    static autoPtr<volScalarField> ssField;
+	    static autoPtr<volScalarField> sssField;
+	    static autoPtr<volScalarField> ssssField;
+	    
+	    if(!sField.valid())
+	    {
+	        sField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Puu",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	    		-2*(R_uu * G_uu + R_uv * G_vu + R_uw * G_wu)
+            		//fvc::div(UMean) * dimensionedScalar("tmp", dimensionSet(0, 2, -2, 0, 0, 0, 0), 1)
+         	    )
+      		);
+	    }
+
+	    if(!ssField.valid())
+	    {
+	        ssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Pvv",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	    		-2*(R_uv * G_uv + R_vv * G_vv + R_vw * G_wv)
+            		//fvc::div(UMean) * dimensionedScalar("tmp", dimensionSet(0, 2, -2, 0, 0, 0, 0), 1)
+         	    )
+      		);
+	    }
+
+	    if(!sssField.valid())
+	    {
+	        sssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Pww",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	    		-2*(R_uw * G_uw + R_vw * G_vw + R_ww * G_ww)
+            		//fvc::div(UMean) * dimensionedScalar("tmp", dimensionSet(0, 2, -2, 0, 0, 0, 0), 1)
+         	    )
+      		);
+	    }
+
+
+	    if(!ssssField.valid())
+	    {
+	        ssssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Puv",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	    		-(R_uu * G_uv + R_uv * G_vv + R_uw * G_wv)-(R_uv * G_uu + R_vv * G_vu + R_vw * G_wu)
+            		//fvc::div(UMean) * dimensionedScalar("tmp", dimensionSet(0, 2, -2, 0, 0, 0, 0), 1)
+         	    )
+      		);
+	    }
+
+	    volScalarField &Puu = sField();
+	    Puu.checkIn();
+	    Puu = -2*(R_uu * G_uu + R_uv * G_vu + R_uw * G_wu);
+
+	    volScalarField &Pvv = ssField();
+	    Pvv.checkIn();
+	    Pvv = -2*(R_uv * G_uv + R_vv * G_vv + R_vw * G_wv);
+	    //Pvv = 0*(R_uv * G_uv + R_vv * G_vv + R_vw * G_wv);
+
+	    volScalarField &Pww = sssField();
+	    Pww.checkIn();
+	    Pww = -2*(R_uw * G_uw + R_vw * G_vw + R_ww * G_ww);
+
+	    volScalarField &Puv = ssssField();
+	    Puv.checkIn();
+	    Puv = -(R_uu * G_uv + R_uv * G_vv + R_uw * G_wv)-(R_uv * G_uu + R_vv * G_vu + R_vw * G_wu);
+	#};
+    }

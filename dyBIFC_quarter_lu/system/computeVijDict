@@ -1,0 +1,128 @@
+computeVij
+{
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeVij;
+ //       writeControl    writeTime; //timeStep;
+//        writeInterval   100;
+        outputControl   outputTime;
+
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volSymmTensorField& UPrime2Mean = mesh().lookupObject<volSymmTensorField>("UPrime2Mean");
+	    const volScalarField& nu = mesh().lookupObject<volScalarField>("nu");
+            const volVectorField& UPrime = mesh().lookupObject<volVectorField>("UPrime");
+	    volScalarField R_uu("R_uu", UPrime2Mean.component(symmTensor::XX));
+	    volScalarField R_uv("R_uv", UPrime2Mean.component(symmTensor::XY));
+	    volScalarField R_vv("R_vv", UPrime2Mean.component(symmTensor::YY));
+	    volScalarField R_ww("R_ww", UPrime2Mean.component(symmTensor::ZZ));
+	    static autoPtr<volScalarField> sField;
+	    static autoPtr<volScalarField> ssField;
+	    static autoPtr<volScalarField> sssField;
+	    static autoPtr<volScalarField> ssssField;
+	    
+
+	    if(!sField.valid())
+	    {
+	        sField.set
+      	        (
+                    new volScalarField
+                    (
+            		IOobject
+            		(
+               		    "Vuu",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                fvc::laplacian(nu,R_uu)
+                    )
+      	        );
+	    }
+
+	    if(!ssField.valid())
+	    {
+		ssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Vvv",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                fvc::laplacian(nu,R_vv)
+         	    )
+      		);
+	    }
+
+	    if(!sssField.valid())
+	    {
+		sssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Vww",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                fvc::laplacian(nu,R_ww)
+         	    )
+      		);
+	    }
+
+	    if(!ssssField.valid())
+	    {
+	        ssssField.set
+      	        (
+         	    new volScalarField
+                    (
+            		IOobject
+            		(
+               		    "Vuv",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    //IOobject::NO_WRITE
+               		    IOobject::AUTO_WRITE
+            		),
+	                fvc::laplacian(nu,R_uv)
+                    )
+      	        );
+	    }
+
+	    // viscous–diffusion terms
+
+	    volScalarField &Vuu = sField();
+	    Vuu.checkIn();
+	    Vuu =  fvc::laplacian(nu,R_uu);
+
+	    volScalarField &Vvv = ssField();
+	    Vvv.checkIn();
+	    Vvv = fvc::laplacian(nu,R_vv);
+
+	   volScalarField &Vww = sssField();
+	   Vww.checkIn();
+	   Vww = fvc::laplacian(nu,R_ww);
+
+	   volScalarField &Vuv = ssssField();
+	   Vuv.checkIn();
+	   Vuv = fvc::laplacian(nu,R_uv);
+
+	#};
+}

@@ -1,0 +1,47 @@
+    computeGradpUPrime
+    {
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeGradpUPrime;
+        //writeControl    writeTime;
+        //outputControl   timeStep;
+        //outputInterval  5;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+            const volVectorField& pUPrime = mesh().lookupObject<volVectorField>("pUPrime");
+            const volVectorField& UMean = mesh().lookupObject<volVectorField>("UMean");
+
+	    static autoPtr<volTensorField> tField;
+	    
+	    if(!tField.valid())
+	    {
+	        tField.set
+      		(
+         	    new volTensorField
+         	    (
+            		IOobject
+            		(
+               		    "GradpUPrime",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+	    		fvc::grad(pUPrime)
+            		//fvc::div(UMean) * dimensionedScalar("tmp", dimensionSet(0, 2, -2, 0, 0, 0, 0), 1)
+         	    )
+      		);
+	    }
+
+	    volTensorField &GradpUPrime = tField();
+	    GradpUPrime.checkIn();
+	    GradpUPrime = fvc::grad(pUPrime);
+	#};
+    }

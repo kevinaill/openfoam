@@ -1,0 +1,130 @@
+computeDij
+{
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeDij;
+ //       writeControl    writeTime; //timeStep;
+//        writeInterval   100;
+        outputControl   outputTime;
+
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volVectorField& UPrime = mesh().lookupObject<volVectorField>("UPrime");
+            const volTensorField& GradpUPrime = mesh().lookupObject<volTensorField>("GradpUPrime");
+	    volScalarField GpUP_uu("GpUP_uu", GradpUPrime.component(tensor::XX));
+	    volScalarField GpUP_vu("GpUP_vu", GradpUPrime.component(tensor::YX));
+	    volScalarField GpUP_uv("GpUP_uv", GradpUPrime.component(tensor::XY));
+	    volScalarField GpUP_vv("GpUP_vv", GradpUPrime.component(tensor::YY));
+	    volScalarField GpUP_ww("GpUP_ww", GradpUPrime.component(tensor::ZZ));
+	    static autoPtr<volScalarField> sField;
+	    static autoPtr<volScalarField> ssField;
+	    static autoPtr<volScalarField> sssField;
+	    static autoPtr<volScalarField> ssssField;
+	    
+
+	    if(!sField.valid())
+	    {
+	        sField.set
+      	        (
+                    new volScalarField
+                    (
+            		IOobject
+            		(
+               		    "Duu",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                -2 * GpUP_uu
+                    )
+      	        );
+	    }
+
+	    if(!ssField.valid())
+	    {
+		ssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Dvv",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                -2 * GpUP_vv
+         	    )
+      		);
+	    }
+
+	    if(!sssField.valid())
+	    {
+		sssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Dww",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                -2 * GpUP_ww
+         	    )
+      		);
+	    }
+
+	    if(!ssssField.valid())
+	    {
+	        ssssField.set
+      	        (
+         	    new volScalarField
+                    (
+            		IOobject
+            		(
+               		    "Duv",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    //IOobject::NO_WRITE
+               		    IOobject::AUTO_WRITE
+            		),
+	                -1 * (GpUP_uv + GpUP_vu)
+                    )
+      	        );
+	    }
+
+	    // pressure–diffusion
+
+	    volScalarField &Duu = sField();
+	    Duu.checkIn();
+	    Duu =  -2 * GpUP_uu;
+	   // Duu =  0 * GpUP_uu;
+
+	    volScalarField &Dvv = ssField();
+	    Dvv.checkIn();
+	    Dvv = -2 * GpUP_vv;
+
+	   volScalarField &Dww = sssField();
+	   Dww.checkIn();
+	   Dww = -2 * GpUP_ww;
+	  // Dww = 0 * GpUP_ww;
+
+	   volScalarField &Duv = ssssField();
+	   Duv.checkIn();
+	   Duv = -1 * (GpUP_uv + GpUP_vu);
+
+	#};
+}

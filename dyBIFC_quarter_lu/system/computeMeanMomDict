@@ -1,0 +1,166 @@
+computeMeanMom
+{
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeMeanMom;
+//        writeControl    writeTime; //timeStep;
+//        writeInterval   100;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volVectorField& UMean = mesh().lookupObject<volVectorField>("UMean");
+	    const volScalarField& pMean = mesh().lookupObject<volScalarField>("pMean");
+	    const volSymmTensorField& UPrime2Mean = mesh().lookupObject<volSymmTensorField>("UPrime2Mean");
+	    const volScalarField& nu = mesh().lookupObject<volScalarField>("nu");
+
+	    static autoPtr<volTensorField> tmField;
+	    static autoPtr<volVectorField> vvmField;
+	    static autoPtr<volVectorField> vvvmField;
+	    static autoPtr<volVectorField> vvvvmField;
+	    static autoPtr<volVectorField> nField;
+	    static autoPtr<volTensorField> tField;
+	    
+	    if(!tmField.valid())
+	    {
+	        tmField.set
+      	        (
+                    new volTensorField
+                    (
+            		IOobject
+            		(
+               		    "advMean",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+			- fvc::grad(UMean) * dimensionedScalar("tmp", dimensionSet(0, 1, -1, 0, 0, 0, 0), 1)
+	                //-UMean*fvc::grad(UMean)
+	    		//-fvc::div(UMean,UMean)
+                    )
+      	        );
+	    }
+
+	    if(!vvmField.valid())
+	    {
+	        vvmField.set
+      	        (
+                    new volVectorField
+                    (
+            		IOobject
+            		(
+               		    "viscMean",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	        	fvc::laplacian(nu,UMean)
+                    )
+      	        );
+	    }
+
+	    if(!vvvvmField.valid())
+	    {
+	        vvvvmField.set
+      	        (
+                    new volVectorField
+                    (
+            		IOobject
+            		(
+               		    "dpdxMean",
+               		    mesh().time().timeName(),
+               		    pMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                -fvc::grad(pMean)
+                    )
+      	        );
+	    }
+
+	    if(!nField.valid())
+	    {
+	        nField.set
+      	        (
+                    new volVectorField
+                    (
+            		IOobject
+            		(
+               		    "rstuMean",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE //AUTO_WRITE
+            		),
+			//pMean
+	                UMean
+                    )
+      	        );
+	    }
+
+	    if(!tField.valid())
+	    {
+	        tField.set
+      	        (
+                    new volTensorField
+                    (
+            		IOobject
+            		(
+               		    "rstgradMean",
+               		    mesh().time().timeName(),
+               		    UMean.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+	                fvc::grad(UMean)
+                    )
+      	        );
+	    }
+
+	    // Mean advection 
+	    volScalarField UM("UM", UMean.component(vector::X));
+	    volVectorField UMean_UM = UM*UMean;
+
+	    volTensorField &advMean = tmField();
+	    advMean.checkIn();
+            advMean = -fvc::grad(UMean_UM);
+
+	    // Mean viscous diffusion
+	    volVectorField &viscMean = vvmField();
+	    viscMean.checkIn();
+	    viscMean = fvc::laplacian(nu,UMean);
+
+	    // RST term
+	    volScalarField uu("uu", UPrime2Mean.component(tensor::XX));
+	    volScalarField uv("uv", UPrime2Mean.component(tensor::XY));
+	    volScalarField uw("uw", UPrime2Mean.component(tensor::XZ));
+
+	    volVectorField &rstuMean = nField();
+	    rstuMean.checkIn();
+
+            forAll( rstuMean.internalField(), i)
+	    {
+     	    //    Info << "Computing UPrime" << nl;
+	    rstuMean.internalField()[i].component(vector::X) = uu.internalField()[i];
+	    rstuMean.internalField()[i].component(vector::Y) = uv.internalField()[i];
+	    rstuMean.internalField()[i].component(vector::Z) = uw.internalField()[i];
+	    }
+
+	    volTensorField &rstgradMean = tField();
+	    rstgradMean.checkIn();
+            rstgradMean = -fvc::grad(rstuMean);
+      
+	    // Pressure term
+	    volVectorField &dpdxMean = vvvvmField();
+	    dpdxMean.checkIn();
+	    dpdxMean = -fvc::grad(pMean);
+
+	#};
+}

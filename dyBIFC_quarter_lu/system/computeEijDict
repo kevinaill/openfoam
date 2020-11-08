@@ -1,0 +1,131 @@
+    computeEij
+    {
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeEij;
+        //writeControl    writeTime;
+        //outputControl   timeStep;
+        //outputInterval  5;
+        outputControl   outputTime;
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volVectorField& UPrime = mesh().lookupObject<volVectorField>("UPrime");
+            const volTensorField& GradUPrime = mesh().lookupObject<volTensorField>("GradUPrime");
+	    const volScalarField& nu = mesh().lookupObject<volScalarField>("nu");
+	    volScalarField GP_uu("GP_uu", GradUPrime.component(tensor::XX));
+	    volScalarField GP_uv("GP_uv", GradUPrime.component(tensor::XY));
+	    volScalarField GP_uw("GP_uw", GradUPrime.component(tensor::XZ));
+	    volScalarField GP_vu("GP_vu", GradUPrime.component(tensor::YX));
+	    volScalarField GP_vv("GP_vv", GradUPrime.component(tensor::YY));
+	    volScalarField GP_vw("GP_vw", GradUPrime.component(tensor::YZ));
+	    volScalarField GP_wu("GP_wu", GradUPrime.component(tensor::ZX));
+	    volScalarField GP_wv("GP_wv", GradUPrime.component(tensor::ZY));
+	    volScalarField GP_ww("GP_ww", GradUPrime.component(tensor::ZZ));
+	    static autoPtr<volScalarField> sField;
+	    static autoPtr<volScalarField> ssField;
+	    static autoPtr<volScalarField> sssField;
+	    static autoPtr<volScalarField> ssssField;
+	    
+	    
+	    if(!sField.valid())
+	    {
+		sField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Euu",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                -2 * nu * (GP_uu * GP_uu + GP_vu * GP_vu + GP_wu * GP_wu)
+         	    )
+      		);
+	    }
+
+	    if(!ssField.valid())
+	    {
+		ssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Evv",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                -2 * nu * (GP_uv * GP_uv + GP_vv * GP_vv + GP_wv * GP_wv)
+         	    )
+      		);
+	    }
+
+	    if(!sssField.valid())
+	    {
+		sssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Eww",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                -2 * nu * (GP_uw * GP_uw + GP_vw * GP_vw + GP_ww * GP_ww)
+         	    )
+      		);
+	    }
+
+	    if(!ssssField.valid())
+	    {
+		ssssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "Euv",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::AUTO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                -2 * nu * (GP_uu * GP_uv + GP_vu * GP_vv + GP_wu * GP_wv)
+         	    )
+      		);
+	    }
+	    volScalarField &Euu = sField(); 
+	    Euu.checkIn();
+	    Euu = -2 * nu * (GP_uu * GP_uu + GP_vu * GP_vu + GP_wu * GP_wu);
+
+	    volScalarField &Evv = ssField(); 
+	    Evv.checkIn();
+	    Evv = -2 * nu * (GP_uv * GP_uv + GP_vv * GP_vv + GP_wv * GP_wv);
+
+	    volScalarField &Eww = sssField(); 
+	    Eww.checkIn();
+	    Eww = -2 * nu * (GP_uw * GP_uw + GP_vw * GP_vw + GP_ww * GP_ww);
+	    
+	    volScalarField &Euv = ssssField(); 
+	    Euv.checkIn();
+	    Euv = -2 * nu * (GP_uu * GP_uv + GP_vu * GP_vv + GP_wu * GP_wv);
+       #};
+    }

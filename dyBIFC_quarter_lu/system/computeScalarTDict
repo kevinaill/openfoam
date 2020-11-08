@@ -1,0 +1,265 @@
+    computeScalarT
+    {
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeScalarT;
+        //writeControl    writeTime;
+        //outputControl   timeStep;
+        //outputInterval  5;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volVectorField& UPrime = mesh().lookupObject<volVectorField>("UPrime");
+	    volScalarField UP1("UP1", UPrime.component(vector::X));
+	    volScalarField UP2("UP2", UPrime.component(vector::Y));
+	    volScalarField UP3("UP3", UPrime.component(vector::Z));
+	    static autoPtr<volScalarField> sField;
+	    static autoPtr<volScalarField> ssField;
+	    static autoPtr<volScalarField> sssField;
+	    static autoPtr<volScalarField> ssssField;
+	    static autoPtr<volScalarField> sssssField;
+	    static autoPtr<volScalarField> ssssssField;
+	    static autoPtr<volScalarField> s7Field;
+	    static autoPtr<volScalarField> s8Field;
+	    static autoPtr<volScalarField> s9Field;
+	    static autoPtr<volScalarField> s10Field;
+	    
+	    if(!sField.valid())
+	    {
+		sField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T1",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP1 * UP1 * UP1
+         	    )
+      		);
+	    }
+	    if(!ssField.valid())
+	    {
+		ssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T2",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP1 * UP1 * UP2
+         	    )
+      		);
+	    }
+	    if(!sssField.valid())
+	    {
+		sssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T3",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP1 * UP1 * UP3
+         	    )
+      		);
+	    }
+	    if(!ssssField.valid())
+	    {
+		ssssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T4",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP2 * UP2 * UP1
+         	    )
+      		);
+	    }
+	    	    	    
+	    if(!sssssField.valid())
+	    {
+		sssssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T5",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP2 * UP2 * UP2
+         	    )
+      		);
+	    }
+	    if(!ssssssField.valid())
+	    {
+		ssssssField.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T6",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP2 * UP2 * UP3
+         	    )
+      		);
+	    }
+	    if(!s7Field.valid())
+	    {
+		s7Field.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T7",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP3 * UP3 * UP1
+         	    )
+      		);
+	    }
+	    if(!s8Field.valid())
+	    {
+		s8Field.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T8",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP3 * UP3 * UP2
+         	    )
+      		);
+	    }
+	    if(!s9Field.valid())
+	    {
+		s9Field.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T9",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP3 * UP3 * UP3
+         	    )
+      		);
+	    }
+	    if(!s10Field.valid())
+	    {
+		s10Field.set
+      		(
+         	    new volScalarField
+         	    (
+            		IOobject
+            		(
+               		    "T10",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	                UP1 * UP2 * UP3
+         	    )
+      		);
+	    }    	    	    
+	    	    	    
+	    volScalarField &T1 = sField(); 
+	    T1.checkIn();
+	    T1 = UP1 * UP1 * UP1;
+
+	    volScalarField &T2 = ssField(); 
+	    T2.checkIn();
+	    T2 = UP1 * UP1 * UP2;
+
+	    volScalarField &T3 = sssField(); 
+	    T3.checkIn();
+	    T3 = UP1 * UP1 * UP3;
+
+	    volScalarField &T4 = ssssField(); 
+	    T4.checkIn();
+	    T4 = UP2 * UP2 * UP1;
+
+	    volScalarField &T5 = sssssField(); 
+	    T5.checkIn();
+	    T5 = UP2 * UP2 * UP2;
+
+	    volScalarField &T6 = ssssssField(); 
+	    T6.checkIn();
+	    T6 = UP2 * UP2 * UP3;
+
+	    volScalarField &T7 = s7Field(); 
+	    T7.checkIn();
+	    T7 = UP3 * UP3 * UP1;
+
+	    volScalarField &T8 = s8Field(); 
+	    T8.checkIn();
+	    T8 = UP3 * UP3 * UP2;
+
+	    volScalarField &T9 = s9Field(); 
+	    T9.checkIn();
+	    T9 = UP3 * UP3 * UP3;
+
+	    volScalarField &T10 = s10Field(); 
+	    T10.checkIn();
+	    T10 = UP1 * UP2 * UP3;
+       #};
+    }

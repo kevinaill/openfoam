@@ -1,0 +1,274 @@
+    computeVectorGradT
+    {
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        enabled         true;
+        type            coded;
+        redirectType    computeVectorGradT;
+        //writeControl    writeTime;
+        //outputControl   timeStep;
+        //outputInterval  5;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        code
+        #{
+	    const volVectorField& UPrime = mesh().lookupObject<volVectorField>("UPrime");
+	    const volScalarField& T1 = mesh().lookupObject<volScalarField>("T1");
+	    const volScalarField& T2 = mesh().lookupObject<volScalarField>("T2");
+	    const volScalarField& T3 = mesh().lookupObject<volScalarField>("T3");
+	    const volScalarField& T4 = mesh().lookupObject<volScalarField>("T4");
+	    const volScalarField& T5 = mesh().lookupObject<volScalarField>("T5");
+	    const volScalarField& T6 = mesh().lookupObject<volScalarField>("T6");
+	    const volScalarField& T7 = mesh().lookupObject<volScalarField>("T7");
+	    const volScalarField& T8 = mesh().lookupObject<volScalarField>("T8");
+	    const volScalarField& T9 = mesh().lookupObject<volScalarField>("T9");
+	    const volScalarField& T10 = mesh().lookupObject<volScalarField>("T10");
+	    static autoPtr<volVectorField> vField;
+	    static autoPtr<volVectorField> vvField;
+	    static autoPtr<volVectorField> vvvField;
+	    static autoPtr<volVectorField> vvvvField;
+	    static autoPtr<volVectorField> vvvvvField;
+	    static autoPtr<volVectorField> vvvvvvField;
+	    static autoPtr<volVectorField> v7Field;
+	    static autoPtr<volVectorField> v8Field;
+	    static autoPtr<volVectorField> v9Field;
+	    static autoPtr<volVectorField> v10Field;
+	    
+	    if(!vField.valid())
+	    {
+		vField.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT1",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T1)
+         	    )
+      		);
+	    }
+	    if(!vvField.valid())
+	    {
+		vvField.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT2",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T2)
+         	    )
+      		);
+	    }
+	    if(!vvvField.valid())
+	    {
+		vvvField.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT3",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T3)
+         	    )
+      		);
+	    }
+	    if(!vvvvField.valid())
+	    {
+		vvvvField.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT4",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T4)
+         	    )
+      		);
+	    }	    
+	    if(!vvvvvField.valid())
+	    {
+		vvvvvField.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT5",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T5)
+         	    )
+      		);
+	    }
+	    if(!vvvvvvField.valid())
+	    {
+		vvvvvvField.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT6",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T6)
+         	    )
+      		);
+	    }    
+
+
+	    if(!v7Field.valid())
+	    {
+		v7Field.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT7",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T7)
+         	    )
+      		);
+	    }
+	    if(!v8Field.valid())
+	    {
+		v8Field.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT8",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T8)
+         	    )
+      		);
+	    }
+	    if(!v9Field.valid())
+	    {
+		v9Field.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT9",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T9)
+         	    )
+      		);
+	    }
+	    if(!v10Field.valid())
+	    {
+		v10Field.set
+      		(
+         	    new volVectorField
+         	    (
+            		IOobject
+            		(
+               		    "GradT10",
+               		    mesh().time().timeName(),
+               		    UPrime.mesh(),
+               		    IOobject::NO_READ,
+               		    IOobject::NO_WRITE
+            		),
+			//(UPrime & UPrime) * dimensionedScalar("tmp", dimensionSet(0, 0, -1, 0, 0, 0, 0), 1)
+	    		fvc::grad(T10)
+         	    )
+      		);
+	    }	    
+
+	    
+	    volVectorField &GradT1 = vField(); 
+	    GradT1.checkIn();
+	    GradT1 = fvc::grad(T1);
+
+	    volVectorField &GradT2 = vvField(); 
+	    GradT2.checkIn();
+	    GradT2 = fvc::grad(T2);
+
+	    volVectorField &GradT3 = vvvField(); 
+	    GradT3.checkIn();
+	    GradT3 = fvc::grad(T3);
+
+	    volVectorField &GradT4 = vvvvField(); 
+	    GradT4.checkIn();
+	    GradT4 = fvc::grad(T4);
+
+	    volVectorField &GradT5 = vvvvvField(); 
+	    GradT5.checkIn();
+	    GradT5 = fvc::grad(T5);
+
+	    volVectorField &GradT6 = vvvvvvField(); 
+	    GradT6.checkIn();
+	    GradT6 = fvc::grad(T6);
+	    
+	    volVectorField &GradT7 = v7Field(); 
+	    GradT7.checkIn();
+	    GradT7 = fvc::grad(T7);
+
+	    volVectorField &GradT8 = v8Field(); 
+	    GradT8.checkIn();
+	    GradT8 = fvc::grad(T8);
+
+	    volVectorField &GradT9 = v9Field(); 
+	    GradT9.checkIn();
+	    GradT9 = fvc::grad(T9);
+
+	    volVectorField &GradT10 = v10Field(); 
+	    GradT10.checkIn();
+	    GradT10 = fvc::grad(T10);
+       #};
+    }
